@@ -2,11 +2,14 @@ package org.isfce.pid.controller;
 
 import java.util.Optional;
 
+import org.isfce.pid.model.Cours;
 import org.isfce.pid.service.CoursService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -42,6 +45,18 @@ public class CoursController {
 	String getListeCours(Model model) {
 		model.addAttribute("listeCours", coursService.getListe());
 		return "/cours/listeCours";
+	}
+
+	@GetMapping("add")
+	String addCoursGet(@ModelAttribute("cours") Cours cours) {
+		return "/cours/addCours";
+	}
+
+	@PostMapping("add")
+	String addCoursPost(@ModelAttribute("cours") Cours cours) {
+		log.info("Ajout d'un cours: "+cours);
+		coursService.addCours(cours);
+		return "redirect:/cours/liste";
 	}
 
 }
