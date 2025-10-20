@@ -1,18 +1,22 @@
 package org.isfce.pid.controller;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.isfce.pid.model.Cours;
 import org.isfce.pid.service.CoursService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
 @Controller
@@ -29,7 +33,9 @@ public class CoursController {
 	@GetMapping("info")
 	String getCours(@RequestParam("code") String id, Model model) {
 		log.info("cours param" + id);
-		model.addAttribute("cours", coursService.getCours(id).get());
+		if (!model.containsAttribute("cours"))
+			model.addAttribute("cours",
+					coursService.getCours(id).orElseThrow(() -> new NoSuchElementException("Ce cours n'existe pas")));
 		return "/cours/cours";
 	}
 
@@ -53,10 +59,22 @@ public class CoursController {
 	}
 
 	@PostMapping("add")
-	String addCoursPost(@ModelAttribute("cours") Cours cours) {
-		log.info("Ajout d'un cours: "+cours);
+	String addCoursPost(@Valid @ModelAttribute("cours") Cours cours, BindingResult errors, Model model,
+			RedirectAttributes rModel) {
+		if (errors.hasErrors()) {
+			log.error(errors.getAllErrors().toString());
+			return "/cours/addCours";
+
+		}
+		if (coursService.existCours(cours)) {
+			errors.rejectValue("code", "err.cours.doublon");
+			return "/cours/addCours";
+		}
+
+		log.info("Ajout d'un cours: " + cours);
 		coursService.addCours(cours);
-		return "redirect:/cours/liste";
+		rModel.addFlashAttribute(cours);
+		return "redirect:/cours/info?code=" + cours.getCode();
 	}
 
 }

@@ -34,4 +34,8 @@ public class CoursService {
 		//listeCours.add(cours);
 	}
 
+	public boolean existCours( Cours cours) {
+		return daoCours.existsById(cours.getCode());
+	}
+
 }
