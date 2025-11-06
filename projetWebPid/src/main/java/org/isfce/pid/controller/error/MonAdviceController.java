@@ -9,7 +9,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-@ControllerAdvice
+//@ControllerAdvice
 public class MonAdviceController {
 	
 	@ExceptionHandler(NoSuchElementException.class)

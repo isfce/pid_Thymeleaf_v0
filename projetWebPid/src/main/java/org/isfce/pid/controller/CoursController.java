@@ -66,7 +66,7 @@ public class CoursController {
 			return "/cours/addCours";
 
 		}
-		if (coursService.existCours(cours)) {
+		if (coursService.existCours(cours.getCode())) {
 			errors.rejectValue("code", "err.cours.doublon");
 			return "/cours/addCours";
 		}

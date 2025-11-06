@@ -34,8 +34,12 @@ public class CoursService {
 		//listeCours.add(cours);
 	}
 
-	public boolean existCours( Cours cours) {
-		return daoCours.existsById(cours.getCode());
+	public boolean existCours(String code) {
+		return daoCours.existsById(code);
+	}
+
+	public void deleteCours(String code) {
+		daoCours.deleteById(code);	
 	}
 
 }
