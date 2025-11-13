@@ -1,9 +1,7 @@
 package org.isfce.pid.controller.error;
 
-import java.net.http.HttpRequest;
 import java.util.NoSuchElementException;
 
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
 

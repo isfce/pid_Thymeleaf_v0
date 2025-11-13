@@ -1,14 +1,19 @@
 package org.isfce.pid.controller;
 
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Locale;
 import java.util.Optional;
+import java.util.ResourceBundle;
 
+import org.isfce.pid.controller.error.DuplicateException;
+import org.isfce.pid.dao.UeDao;
 import org.isfce.pid.model.Cours;
+import org.isfce.pid.model.UE;
 import org.isfce.pid.service.CoursService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,6 +31,8 @@ import lombok.extern.slf4j.Slf4j;
 public class CoursControllerRest {
 
 	private CoursService coursService;
+	@Autowired
+	private MessageSource bundle;
 
 	public CoursControllerRest(CoursService coursService) {
 		this.coursService = coursService;
@@ -49,14 +56,10 @@ public class CoursControllerRest {
 	}
 
 	@PostMapping(path = "add", consumes = "application/json")
-	ResponseEntity<Cours> addCoursPost(@Valid @RequestBody Cours cours, BindingResult errors) {
-		if (errors.hasErrors()) {
-			log.error(errors.getAllErrors().toString());
-			return new ResponseEntity<Cours>(cours, HttpStatus.BAD_REQUEST);
-
-		}
+	ResponseEntity<Cours> addCoursPost(@Valid @RequestBody Cours cours, Locale locale) {
 		if (coursService.existCours(cours.getCode()))
-			throw new NoSuchElementException("Le code" + cours.getCode() + "existe déjà");
+			throw new DuplicateException(bundle.getMessage("err.cours.doublon", null, locale), "code");
+
 		log.info("Ajout d'un cours: " + cours);
 		coursService.addCours(cours);
 		return new ResponseEntity<>(cours, HttpStatus.CREATED);
@@ -70,24 +73,4 @@ public class CoursControllerRest {
 		return ResponseEntity.ok(code);
 	}
 
-	/*
-	 * @GetMapping("liste") String getListeCours(Model model) {
-	 * model.addAttribute("listeCours", coursService.getListe()); return
-	 * "/cours/listeCours"; }
-	 * 
-	 * @GetMapping("add") String addCoursGet(@ModelAttribute("cours") Cours cours) {
-	 * return "/cours/addCours"; }
-	 * 
-	 * @PostMapping("add") String addCoursPost(@Valid @ModelAttribute("cours") Cours
-	 * cours, BindingResult errors, Model model, RedirectAttributes rModel) { if
-	 * (errors.hasErrors()) { log.error(errors.getAllErrors().toString()); return
-	 * "/cours/addCours";
-	 * 
-	 * } if (coursService.existCours(cours)) { errors.rejectValue("code",
-	 * "err.cours.doublon"); return "/cours/addCours"; }
-	 * 
-	 * log.info("Ajout d'un cours: " + cours); coursService.addCours(cours);
-	 * rModel.addFlashAttribute(cours); return "redirect:/cours/info?code=" +
-	 * cours.getCode(); }
-	 */
 }
