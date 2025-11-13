@@ -29,10 +29,6 @@ spring:
     activate:
       on-profile:
       - dev
-  messages:
-    basename:
-    - messages
-    encoding: UTF-8
   datasource:
     url: jdbc:h2:~/PID_DB/pidDB_TH0
     username: sa
