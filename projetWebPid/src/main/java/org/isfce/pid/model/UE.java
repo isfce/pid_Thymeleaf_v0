@@ -2,6 +2,7 @@ package org.isfce.pid.model;
 
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -39,7 +40,7 @@ public class UE {
 	private int ects;// 8
 	@Lob
 	private String prgm;// Bloc de texte
-	@OneToMany(fetch = FetchType.EAGER)
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name = "FKUE")
 	private List<Acquis> acquis;
 }

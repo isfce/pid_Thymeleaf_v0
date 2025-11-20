@@ -1,12 +1,14 @@
 package org.isfce.pid.controller;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.ResourceBundle;
 
 import org.isfce.pid.controller.error.DuplicateException;
 import org.isfce.pid.dao.UeDao;
+import org.isfce.pid.model.Acquis;
 import org.isfce.pid.model.Cours;
 import org.isfce.pid.model.UE;
 import org.isfce.pid.service.CoursService;
@@ -72,5 +74,57 @@ public class CoursControllerRest {
 		coursService.deleteCours(code);
 		return ResponseEntity.ok(code);
 	}
+	@Autowired
+	UeDao daoUe;
+	@GetMapping("listeUE")
+	ResponseEntity<List<UE>> getListeUE() {
+		daoUe.deleteById("IPAP");
+		daoUe.save(creePAP());
+		
+		return ResponseEntity.ok(daoUe.findAll());
+	}
+	@PostMapping(path = "addUE", consumes = "application/json")
+	ResponseEntity<UE> addUEPost(@Valid @RequestBody UE cours, Locale locale) {
+		daoUe.deleteById(cours.getCode());
+		
+		log.info("Ajout d'une UE: " + cours);
+		cours=daoUe.save(cours);
+		return new ResponseEntity<>(cours, HttpStatus.CREATED);
+	}
+	
+	UE creePAP() {
+		String code = "7521 05 U32 D3";
+		Acquis[] acquis = { new Acquis("mettre en oeuvre une représentation algorithmique du problème posé", 30),
+				new Acquis("de développer au moins un programme en respectant les spécificités du langage choisi", 30),
+				new Acquis("de mettre en oeuvre des procédures de test", 20),
+				new Acquis("de justifier la démarche mise en oeuvre dans l’élaboration du (ou des) programme(s)", 20) };
+
+		String prgm = """
+				* d'identifier différents langages de programmation existants ;
+				* de mettre en oeuvre une méthodologie de résolution de problème (observation,
+				résolution, expérimentation, validation) et de la justifier en fonction de l’objectif
+				poursuivi ;
+				* de concevoir, construire et représenter des algorithmes, en utilisant :
+					o les types de données élémentaires,
+					o les figures algorithmiques de base (séquence, alternative et répétitive),
+					o les instructions,
+					o les portées des variables,
+					o les fonctions et procédures,
+					o la récursivité,
+					o les entrées/sorties,
+					o les fichiers,
+					o les structures de données de base (tableaux et enregistrements) ;
+				* de traduire de manière adéquate des algorithmes en respectant les spécificités du
+				langage utilisé (JAVA, PYTHON);
+				* de documenter de manière complète et précise les programmes développés ;
+				* de produire des tests pour valider les programmes développés.
+								""";
+		List<Acquis> liste = new ArrayList<Acquis>(Arrays.asList(acquis));
+		UE pap = UE.builder().code("IPAP").ects(8).nbPeriodes(120).nom("PRINCIPES ALGORITHMIQUES ET PROGRAMMATION")
+				.prgm(prgm).ref(code).acquis(liste).build();
+
+		return pap;
+	}
+	
 
 }

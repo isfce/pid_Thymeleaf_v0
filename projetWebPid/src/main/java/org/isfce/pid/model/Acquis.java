@@ -5,7 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,7 +24,8 @@ public class Acquis {
 	@Column(length = 500)
 	private String acquis;
 	
-	@Size(min = 1, max = 100, message = "{err.aquis.pourcentage}")
+	@Min(value = 1, message = "{err.aquis.pourcentage.min}")
+	@Max(value = 100, message = "{err.aquis.pourcentage.max}")
 	private Integer pourcentage;
 	
 	
